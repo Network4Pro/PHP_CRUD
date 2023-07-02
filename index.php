@@ -24,7 +24,7 @@ require "connexion.php";
     </div>
 
     <div class="container mt-5 p-0">
-    <table class="table table-hover texte-center">
+    <table class="table table-hover text-center">
         <thead class="bg-dark text-light">
           <tr>
             <th width="10%" scope="col" class="rounded-start">Sr. N</th>
@@ -44,14 +44,14 @@ require "connexion.php";
 
             while($fetch=mysqli_fetch_assoc($result)){
               echo<<<product
-              <tr>
+              <tr class="align-middle">
                   <th scope="row">$i</th>
                   <td><img src="$fetch_src$fetch[image]" width="110px" ></td>
                   <td>$fetch[name]</td>
-                  <td>$fetch[price]</td>
+                  <td>$fetch[price] DH</td>
                   <td>$fetch[description]</td>
                   <td>
-                    <a class="btn btn-warning me-2"><i class="bi bi-pencil-square"></i></a>
+                    <a href="?edit=$fetch[ID]" class="btn btn-warning me-2"><i class="bi bi-pencil-square"></i></a>
                     <button onclick="confirm_rem($fetch[ID])" class="btn btn-danger"><i class="bi bi-trash"></i></button>
                   </td>
               </tr>
@@ -62,7 +62,7 @@ require "connexion.php";
         </tbody>
     </table>
     </div>
-    
+
     <div class="modal fade" id="addproduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form action="crud.php" method="post" enctype="multipart/form-data">
@@ -98,13 +98,83 @@ require "connexion.php";
       </div>
 </div>
 
+    <div class="modal fade" id="editproduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form action="crud.php" method="post" enctype="multipart/form-data">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" >Modifier Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">Name</span>
+                    <input type="text" class="form-control" name="name" id="editname" required>
+                  </div>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">Price</span>
+                    <input type="number" class="form-control" name="price" id="editprice" min="1" required>
+                  </div>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">Description</span>
+                    <textarea class="form-control" name="desc" id="editdescription" required></textarea>
+                  </div>
+                  <img src="" id="editimg" width="100%" class="mb-3"><br>
+                  <div class="input-group mb-3">
+                    <label class="input-group-text">Image</label>
+                    <input type="file" class="form-control" onchange="updateImagePreview(event)" name="image" accept=".jpg, .png, .svg">
+                  </div>
+                  <input type="hidden" name="productid" id="editpid">
+              </div>
+              <div class="modal-footer">
+                <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-success" name="editproduct">Edit</button>
+              </div>
+            </div>
+        </form>
+          </div>
+    </div>
+
+    <?php  
+      if( isset($_GET['edit']) && $_GET['edit']>0 ){
+        $query="SELECT * FROM products Where ID={$_GET['edit']}";
+        $result = mysqli_query($connexion,$query);
+        $fetch=mysqli_fetch_assoc($result);
+        echo "
+          <script>
+              var editproduct = new bootstrap.Modal(document.getElementById('editproduct'), {
+                keyboard: false
+              });
+              document.querySelector('#editname').value='$fetch[name]';
+              document.querySelector('#editprice').value=$fetch[price];
+              document.querySelector('#editdescription').value='$fetch[description]';
+              document.querySelector('#editimg').src='$fetch_src$fetch[image]';
+              document.querySelector('#editpid').value=$_GET[edit];
+              editproduct.show();
+          </script>
+        ";
+      }
+    ?>
+
 <script>
   function confirm_rem(id){
     if(confirm("Are you sure, you want to delete this iteam")){
       window.location.href="crud.php?rem="+id;
     }
   }
+
+  function updateImagePreview(event) {
+  var editImage = document.getElementById('editimg');
+  if (event.target.files && event.target.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      editImage.src = e.target.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+}
 </script>
+
 
 </body>
 </html>
