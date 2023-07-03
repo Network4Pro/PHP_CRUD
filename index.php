@@ -23,7 +23,29 @@ require "connexion.php";
         </div>
     </div>
 
-    <div class="container mt-5 p-0">
+    <?php  
+      function Show_Message($type,$Message,$icon){
+        $Message = str_replace('_', ' ', $Message);
+        $Message = str_replace('!!!!', '!!!!', $Message);
+        $Message_Complet = "<div class='container alert alert-{$type} alert-dismissible text-center' role='alert'>
+        <i class='bi bi-{$icon}-fill'></i>
+        <strong>{$Message}</strong>
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+        </div>";
+        return $Message_Complet;
+      }
+
+      if(isset($_GET['alert'])){
+        echo Show_Message('alert',$_GET['alert'],"exclamation-triangle");
+      }
+      
+      else if(isset($_GET['success'])){
+        echo Show_Message('success',$_GET['success'],"check-circle");
+      }
+    ?>
+
+
+    <div class="container mt-2 p-0">
     <table class="table table-hover text-center">
         <thead class="bg-dark text-light">
           <tr>
@@ -124,7 +146,7 @@ require "connexion.php";
                     <label class="input-group-text">Image</label>
                     <input type="file" class="form-control" onchange="updateImagePreview(event)" name="image" accept=".jpg, .png, .svg">
                   </div>
-                  <input type="hidden" name="productid" id="editpid">
+                  <input type="hidden" name="editpid" id="editpid">
               </div>
               <div class="modal-footer">
                 <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
